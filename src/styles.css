@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --bg-white: #ffffff;
+  --text-main: #111827;
+  --border-gray: #e5e7eb;
+  --text-muted: #6b7280;
+
+  --accent-blue: #2563eb;
+  --accent-amber: #d97706;
+  --accent-red: #dc2626;
+  --accent-green: #16a34a;
+
+  --surface: #ffffff;
+  --surface-hover: #f9fafb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  background-color: var(--bg-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+a:hover {
+  color: #1d4ed8;
+}
+
+button {
+  transition: all 150ms ease;
+}
+
+/* Base input styling for simple minimal look */
+input,
+textarea,
+select {
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: inherit;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+/* Minimal Buttons */
+.btn-primary {
+  background-color: var(--accent-blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-gray);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: var(--surface-hover);
+}
+
+/* Simple cards with borders */
+.card-clean {
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* Status Indicators */
+.status-dot {
+  display: inline-block;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot-open {
+  background-color: var(--accent-green);
+  box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4);
+  animation: pulse-green 2s infinite;
+}
+
+.status-dot-closed {
+  background-color: var(--text-muted);
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(22, 163, 74, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+}

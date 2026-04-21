@@ -1,0 +1,10 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Admin UI",
+			"type": "shell",
+			"command": "node build_admin_ui.js && bun run build"
+		}
+	]
+}
