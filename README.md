@@ -38,8 +38,9 @@ Create a `.env.local` file in the project root:
 # Convex
 VITE_CONVEX_URL=https://<your-deployment>.convex.cloud
 
-# Auth — generate with: openssl rand -base64 32
-JWT_SECRET=your_jwt_secret_here
+# Auth — generate both with: openssl rand -base64 32
+AUTH_SECRET=your_access_token_secret_here
+REFRESH_SECRET=your_refresh_token_secret_here
 
 # Super admin password (plain text, set once)
 SUPER_ADMIN_PASSWORD=your_super_admin_password

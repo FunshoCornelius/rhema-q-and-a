@@ -16,20 +16,13 @@ import { AdminHeader } from '../../components/features/admin-layout/admin-header
 import { ActiveSessionView } from '../../components/features/sessions/active-session-view'
 import { CreateSessionForm } from '../../components/features/sessions/create-session-form'
 import { PastSessionsList } from '../../components/features/sessions/past-sessions-list'
+import { getAdminSession, logoutAdmin } from '../../server/middleware'
 
 export const Route = createFileRoute('/admin/')({
-  beforeLoad: () => {
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('admin-auth-token')
-      if (!token) throw redirect({ to: '/admin/login' })
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]))
-        return { adminInfo: payload as { campusId: string; level: string; role: string } }
-      } catch {
-        localStorage.removeItem('admin-auth-token')
-        throw redirect({ to: '/admin/login' })
-      }
-    }
+  beforeLoad: async () => {
+    const adminInfo = await getAdminSession()
+    if (!adminInfo) throw redirect({ to: '/admin/login' })
+    return { adminInfo }
   },
   head: () => ({ meta: [{ title: 'Admin Dashboard — Rhema BTC' }, { name: 'robots', content: 'noindex, nofollow' }] }),
   component: AdminDashboard,
@@ -86,9 +79,8 @@ function AdminDashboard() {
       ? `${window.location.origin}/student/${adminInfo?.campusId}/${adminInfo?.level}`
       : ''
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin-auth-token')
-    toast.success('Logged out')
+  const handleLogout = async () => {
+    await logoutAdmin()
     navigate({ to: '/admin/login' })
   }
 
@@ -165,13 +157,7 @@ function AdminDashboard() {
     }
   }
 
-  if (!adminInfo) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (!adminInfo) return null
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'latest', label: 'Latest Session' },

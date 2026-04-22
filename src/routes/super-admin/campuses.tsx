@@ -7,14 +7,12 @@ import { SuperAdminLayout } from '../../components/features/super-admin/super-ad
 import { CreateCampusForm } from '../../components/features/super-admin/create-campus-form'
 import { CampusCard } from '../../components/features/super-admin/campus-card'
 import { SetPasswordModal } from '../../components/features/super-admin/set-password-modal'
+import { getSuperAdminSession } from '../../server/middleware'
 
 export const Route = createFileRoute('/super-admin/campuses')({
-  beforeLoad: () => {
-    if (typeof window !== 'undefined') {
-      if (!localStorage.getItem('super-admin-token')) {
-        throw redirect({ to: '/super-admin/login' })
-      }
-    }
+  beforeLoad: async () => {
+    const session = await getSuperAdminSession()
+    if (!session) throw redirect({ to: '/super-admin/login' })
   },
   head: () => ({ meta: [{ title: 'Campuses & Admins — Rhema BTC' }, { name: 'robots', content: 'noindex, nofollow' }] }),
   component: SuperAdminCampuses,

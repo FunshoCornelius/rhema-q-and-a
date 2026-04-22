@@ -3,18 +3,13 @@ import { Building2, Radio, MessageCircle, ArrowUp } from 'lucide-react'
 import { useQuery } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { SuperAdminLayout } from '../../components/features/super-admin/super-admin-layout'
-import {
-  StatCard,
-  CampusOverviewCard,
-} from '../../components/features/super-admin/overview-cards'
+import { StatCard, CampusOverviewCard } from '../../components/features/super-admin/overview-cards'
+import { getSuperAdminSession } from '../../server/middleware'
 
 export const Route = createFileRoute('/super-admin/')({
-  beforeLoad: () => {
-    if (typeof window !== 'undefined') {
-      if (!localStorage.getItem('super-admin-token')) {
-        throw redirect({ to: '/super-admin/login' })
-      }
-    }
+  beforeLoad: async () => {
+    const session = await getSuperAdminSession()
+    if (!session) throw redirect({ to: '/super-admin/login' })
   },
   head: () => ({ meta: [{ title: 'Super Admin Overview — Rhema BTC' }, { name: 'robots', content: 'noindex, nofollow' }] }),
   component: SuperAdminOverview,

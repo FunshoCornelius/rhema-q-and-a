@@ -2,21 +2,35 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import { signToken } from '../../server/auth'
+import { signAccessToken, signRefreshToken } from '../../server/auth'
+import { setAuthCookies } from '../../server/cookies'
 
-const loginSuperAdmin = (createServerFn({ method: 'POST' }) as any)
+const loginSuperAdmin = createServerFn({ method: 'POST' })
   .inputValidator((d: { password: string }) => d)
-  .handler(async ({ data }: { data: { password: string } }) => {
+  .handler(async ({ data }) => {
     const validPassword = process.env.SUPER_ADMIN_PASSWORD
     if (!validPassword) throw new Error('Server not configured correctly.')
     if (data.password !== validPassword) throw new Error('Invalid password')
-    const token = await signToken({ role: 'super' })
-    return { token }
+
+    const claims = { role: 'super' }
+    const [accessToken, refreshToken] = await Promise.all([
+      signAccessToken(claims),
+      signRefreshToken(claims),
+    ])
+
+    setAuthCookies(accessToken, refreshToken)
+    // Return success — redirect happens in the component
+    return { ok: true }
   })
 
 export const Route = createFileRoute('/super-admin/login')({
   component: SuperAdminLogin,
-  head: () => ({ meta: [{ title: 'Super Admin — Rhema BTC' }, { name: 'robots', content: 'noindex, nofollow' }] }),
+  head: () => ({
+    meta: [
+      { title: 'Super Admin — Rhema BTC' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
+  }),
 })
 
 function SuperAdminLogin() {
@@ -31,12 +45,10 @@ function SuperAdminLogin() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await loginSuperAdmin({ data: { password } })
-      localStorage.setItem('super-admin-token', res.token)
+      await loginSuperAdmin({ data: { password } })
       navigate({ to: '/super-admin' })
     } catch (err: any) {
       setError(err.message || 'Invalid password')
-    } finally {
       setIsLoading(false)
     }
   }

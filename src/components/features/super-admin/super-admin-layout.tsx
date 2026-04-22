@@ -1,5 +1,6 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { LayoutDashboard, Building2, LogOut } from 'lucide-react'
+import { logoutSuperAdmin } from '../../../server/middleware'
 
 interface SuperAdminLayoutProps {
   active: 'overview' | 'campuses'
@@ -15,8 +16,8 @@ const NAV = [
 export function SuperAdminLayout({ active, campuses = [], children }: SuperAdminLayoutProps) {
   const navigate = useNavigate()
 
-  const handleSignOut = () => {
-    localStorage.removeItem('super-admin-token')
+  const handleSignOut = async () => {
+    await logoutSuperAdmin()
     navigate({ to: '/super-admin/login' })
   }
 

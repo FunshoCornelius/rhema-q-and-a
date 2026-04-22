@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useState } from 'react'
-import { signToken } from '../../server/auth'
+import { signAccessToken, signRefreshToken } from '../../server/auth'
+import { setAuthCookies } from '../../server/cookies'
 import { ConvexHttpClient } from 'convex/browser'
 import bcrypt from 'bcryptjs'
 import { Eye, EyeOff } from 'lucide-react'
@@ -11,7 +12,7 @@ import { LEVELS } from '../../config/campuses'
 
 const loginAdmin = createServerFn({ method: 'POST' })
   .inputValidator((d: { campusId: string; level: string; password: string }) => d)
-  .handler(async ({ data }: { data: { campusId: string; level: string; password: string } }) => {
+  .handler(async ({ data }) => {
     const convexUrl = process.env.VITE_CONVEX_URL
     if (!convexUrl) throw new Error('VITE_CONVEX_URL missing')
 
@@ -26,13 +27,26 @@ const loginAdmin = createServerFn({ method: 'POST' })
     const match = await bcrypt.compare(data.password, adminRecord.passwordHash)
     if (!match) throw new Error('Invalid credentials')
 
-    const token = await signToken({ role: 'admin', campusId: data.campusId, level: data.level })
-    return { token }
+    const claims = { role: 'admin', campusId: data.campusId, level: data.level }
+    const [accessToken, refreshToken] = await Promise.all([
+      signAccessToken(claims),
+      signRefreshToken(claims),
+    ])
+
+    setAuthCookies(accessToken, refreshToken)
+    // Return success — redirect happens in the component
+    return { ok: true }
   })
 
 export const Route = createFileRoute('/admin/login')({
   component: AdminLogin,
-  head: () => ({ meta: [{ title: 'Admin Sign In — Rhema BTC' }, { name: 'description', content: 'Sign in to manage your campus Q&A session.' }, { name: 'robots', content: 'noindex, nofollow' }] }),
+  head: () => ({
+    meta: [
+      { title: 'Admin Sign In — Rhema BTC' },
+      { name: 'description', content: 'Sign in to manage your campus Q&A session.' },
+      { name: 'robots', content: 'noindex, nofollow' },
+    ],
+  }),
 })
 
 function AdminLogin() {
@@ -53,12 +67,10 @@ function AdminLogin() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await loginAdmin({ data: { campusId, level, password } })
-      localStorage.setItem('admin-auth-token', res.token)
+      await loginAdmin({ data: { campusId, level, password } })
       navigate({ to: '/admin' })
     } catch (err: any) {
       setError(err.message || 'Invalid credentials')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -66,14 +78,10 @@ function AdminLogin() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
         <div className="mb-8">
           <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-blue-600 mb-5">
             <svg width="18" height="18" viewBox="0 0 22 22" fill="none">
-              <path
-                d="M11 2L3 6v5c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V6L11 2z"
-                fill="white"
-              />
+              <path d="M11 2L3 6v5c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V6L11 2z" fill="white" />
               <path d="M8 11l2 2 4-4" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
