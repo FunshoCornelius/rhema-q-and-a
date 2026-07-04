@@ -128,7 +128,7 @@ export const deleteSession = mutation({
     await ctx.db.delete(args.sessionId)
     const questions = await ctx.db
       .query('questions')
-      .filter((q) => q.eq(q.field('sessionId'), args.sessionId))
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
       .collect()
     for (const q of questions) {
       await ctx.db.delete(q._id)

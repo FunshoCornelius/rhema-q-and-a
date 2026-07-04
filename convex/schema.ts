@@ -34,5 +34,5 @@ export default defineSchema({
     submittedBy: v.string(),
     createdAt: v.number(),
     isProjected: v.boolean(),
-  }),
+  }).index('by_sessionId', ['sessionId']),
 })

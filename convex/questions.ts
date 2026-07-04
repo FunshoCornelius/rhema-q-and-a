@@ -6,7 +6,7 @@ export const getSessionQuestions = query({
   handler: async (ctx, args) => {
     return await ctx.db
       .query('questions')
-      .filter((q) => q.eq(q.field('sessionId'), args.sessionId))
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
       .order('desc')
       .collect()
   },
@@ -25,7 +25,7 @@ export const toggleProjectQuestion = mutation({
     // Unproject all others in session
     const questions = await ctx.db
       .query('questions')
-      .filter((q) => q.eq(q.field('sessionId'), args.sessionId))
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
       .collect()
 
     for (const q of questions) {
@@ -68,7 +68,7 @@ export const submitQuestion = mutation({
 
     const existing = await ctx.db
       .query('questions')
-      .filter((q) => q.eq(q.field('sessionId'), args.sessionId))
+      .withIndex('by_sessionId', (q) => q.eq('sessionId', args.sessionId))
       .filter((q) => q.eq(q.field('submittedBy'), args.submittedBy))
       .first()
 
