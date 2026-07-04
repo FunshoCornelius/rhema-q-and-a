@@ -17,6 +17,7 @@ import { Route as SuperAdminCampusesRouteImport } from './routes/super-admin/cam
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as StudentCampusIdLevelRouteImport } from './routes/student/$campusId/$level'
 import { Route as ProjectorCampusIdLevelRouteImport } from './routes/projector/$campusId/$level'
+import { Route as InstructorCampusIdLevelRouteImport } from './routes/instructor/$campusId/$level'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +59,11 @@ const ProjectorCampusIdLevelRoute = ProjectorCampusIdLevelRouteImport.update({
   path: '/projector/$campusId/$level',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstructorCampusIdLevelRoute = InstructorCampusIdLevelRouteImport.update({
+  id: '/instructor/$campusId/$level',
+  path: '/instructor/$campusId/$level',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/super-admin/': typeof SuperAdminIndexRoute
+  '/instructor/$campusId/$level': typeof InstructorCampusIdLevelRoute
   '/projector/$campusId/$level': typeof ProjectorCampusIdLevelRoute
   '/student/$campusId/$level': typeof StudentCampusIdLevelRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/admin': typeof AdminIndexRoute
   '/super-admin': typeof SuperAdminIndexRoute
+  '/instructor/$campusId/$level': typeof InstructorCampusIdLevelRoute
   '/projector/$campusId/$level': typeof ProjectorCampusIdLevelRoute
   '/student/$campusId/$level': typeof StudentCampusIdLevelRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/super-admin/login': typeof SuperAdminLoginRoute
   '/admin/': typeof AdminIndexRoute
   '/super-admin/': typeof SuperAdminIndexRoute
+  '/instructor/$campusId/$level': typeof InstructorCampusIdLevelRoute
   '/projector/$campusId/$level': typeof ProjectorCampusIdLevelRoute
   '/student/$campusId/$level': typeof StudentCampusIdLevelRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/super-admin/login'
     | '/admin/'
     | '/super-admin/'
+    | '/instructor/$campusId/$level'
     | '/projector/$campusId/$level'
     | '/student/$campusId/$level'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/super-admin/login'
     | '/admin'
     | '/super-admin'
+    | '/instructor/$campusId/$level'
     | '/projector/$campusId/$level'
     | '/student/$campusId/$level'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/super-admin/login'
     | '/admin/'
     | '/super-admin/'
+    | '/instructor/$campusId/$level'
     | '/projector/$campusId/$level'
     | '/student/$campusId/$level'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   SuperAdminLoginRoute: typeof SuperAdminLoginRoute
   AdminIndexRoute: typeof AdminIndexRoute
   SuperAdminIndexRoute: typeof SuperAdminIndexRoute
+  InstructorCampusIdLevelRoute: typeof InstructorCampusIdLevelRoute
   ProjectorCampusIdLevelRoute: typeof ProjectorCampusIdLevelRoute
   StudentCampusIdLevelRoute: typeof StudentCampusIdLevelRoute
 }
@@ -192,6 +205,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectorCampusIdLevelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instructor/$campusId/$level': {
+      id: '/instructor/$campusId/$level'
+      path: '/instructor/$campusId/$level'
+      fullPath: '/instructor/$campusId/$level'
+      preLoaderRoute: typeof InstructorCampusIdLevelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuperAdminLoginRoute: SuperAdminLoginRoute,
   AdminIndexRoute: AdminIndexRoute,
   SuperAdminIndexRoute: SuperAdminIndexRoute,
+  InstructorCampusIdLevelRoute: InstructorCampusIdLevelRoute,
   ProjectorCampusIdLevelRoute: ProjectorCampusIdLevelRoute,
   StudentCampusIdLevelRoute: StudentCampusIdLevelRoute,
 }

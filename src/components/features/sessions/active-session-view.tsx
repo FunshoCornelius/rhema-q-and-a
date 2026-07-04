@@ -21,6 +21,7 @@ interface ActiveSessionViewProps {
   sortOrder: 'newest' | 'votes'
   setSortOrder: (order: 'newest' | 'votes') => void
   studentUrl: string
+  instructorUrl: string
 }
 
 export function ActiveSessionView({
@@ -33,6 +34,7 @@ export function ActiveSessionView({
   sortOrder,
   setSortOrder,
   studentUrl,
+  instructorUrl,
 }: ActiveSessionViewProps) {
   const [deleteQuestionId, setDeleteQuestionId] = useState<string | null>(null)
 
@@ -126,7 +128,12 @@ export function ActiveSessionView({
           </p>
         </div>
 
-        <QrExportPanel session={session} studentUrl={studentUrl} onProjectQR={onProjectQR} />
+        <QrExportPanel
+          session={session}
+          studentUrl={studentUrl}
+          instructorUrl={instructorUrl}
+          onProjectQR={onProjectQR}
+        />
       </div>
 
       <Dialog

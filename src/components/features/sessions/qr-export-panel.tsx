@@ -2,17 +2,19 @@ import { QRCodeSVG } from 'qrcode.react'
 import { toBlob } from 'html-to-image'
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
-import { MonitorPlay } from 'lucide-react'
+import { MonitorPlay, Presentation } from 'lucide-react'
 
 interface QrExportPanelProps {
   session: any
   studentUrl: string
+  instructorUrl: string
   onProjectQR: () => void
 }
 
 export function QrExportPanel({
   session,
   studentUrl,
+  instructorUrl,
   onProjectQR,
 }: QrExportPanelProps) {
   const [isDownloading, setIsDownloading] = useState(false)
@@ -249,6 +251,26 @@ export function QrExportPanel({
           ) : (
             'Download'
           )}
+        </button>
+      </div>
+
+      {/* Instructor View link — private read-only feed for the person teaching */}
+      <div className="w-full mt-5 pt-5 border-t border-gray-100 flex flex-col items-center">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+          <Presentation size={13} /> Instructor View
+        </p>
+        <div className="p-2.5 border border-gray-100 rounded-xl mb-3 bg-white">
+          <QRCodeSVG value={instructorUrl} size={112} />
+        </div>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(instructorUrl)
+            toast.success('Instructor link copied!')
+          }}
+          className="text-xs font-mono bg-gray-50 border border-gray-200 text-gray-500 px-3 py-2 rounded-lg w-full truncate text-center hover:bg-gray-100 transition-colors"
+          title="Click to copy the instructor link"
+        >
+          Copy instructor link
         </button>
       </div>
     </div>

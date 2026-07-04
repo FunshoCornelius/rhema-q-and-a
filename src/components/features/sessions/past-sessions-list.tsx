@@ -1,10 +1,12 @@
-import { Trash2 } from 'lucide-react'
+import { Trash2, FileSpreadsheet, Loader2 } from 'lucide-react'
 
 interface PastSessionsListProps {
   sessions: any[] | undefined
   selectedId?: string | null
   onSelect: (session: any) => void
   onDeleteSession: (id: any) => void
+  onExport: (session: any) => void
+  exportingId?: string | null
 }
 
 export function PastSessionsList({
@@ -12,6 +14,8 @@ export function PastSessionsList({
   selectedId,
   onSelect,
   onDeleteSession,
+  onExport,
+  exportingId,
 }: PastSessionsListProps) {
   if (sessions === undefined)
     return <div className="p-8 text-center text-sm text-gray-400 animate-pulse">Loading…</div>
@@ -83,12 +87,27 @@ export function PastSessionsList({
                 {session.questionCount} Qs · {session.totalVotes} votes
               </td>
               <td className="px-5 py-4 text-right">
-                <button
-                  onClick={(e) => { e.stopPropagation(); onDeleteSession(session._id) }}
-                  className="text-xs text-red-500 hover:text-red-700 inline-flex items-center gap-1 transition-colors"
-                >
-                  <Trash2 size={13} /> Delete
-                </button>
+                <div className="inline-flex items-center gap-3">
+                  <button
+                    disabled={exportingId === session._id}
+                    onClick={(e) => { e.stopPropagation(); onExport(session) }}
+                    className="text-xs text-green-600 hover:text-green-700 inline-flex items-center gap-1 transition-colors disabled:opacity-50 disabled:cursor-wait"
+                    title="Export questions to Excel"
+                  >
+                    {exportingId === session._id ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <FileSpreadsheet size={13} />
+                    )}
+                    {exportingId === session._id ? 'Exporting…' : 'Excel'}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onDeleteSession(session._id) }}
+                    className="text-xs text-red-500 hover:text-red-700 inline-flex items-center gap-1 transition-colors"
+                  >
+                    <Trash2 size={13} /> Delete
+                  </button>
+                </div>
               </td>
             </tr>
           ))}

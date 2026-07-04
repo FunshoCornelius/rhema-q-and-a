@@ -1,10 +1,11 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState, useRef } from 'react'
-import { useQuery, useMutation } from 'convex/react'
+import { useQuery, useMutation, useConvex } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import type { Id } from '../../../convex/_generated/dataModel'
 import { toast } from 'react-hot-toast'
 import { ChevronLeft } from 'lucide-react'
+import { exportSessionToExcel } from '../../utils/export-excel'
 import {
   Dialog,
   DialogHeader,
@@ -40,6 +41,7 @@ function usePastSessionQuestions(sessionId: string | null) {
 
 function AdminDashboard() {
   const navigate = useNavigate()
+  const convex = useConvex()
   const context = Route.useRouteContext()
   const adminInfo = context?.adminInfo as { campusId: string; level: string; role: string } | undefined
 
@@ -69,6 +71,7 @@ function AdminDashboard() {
   const [deleteSessionId, setDeleteSessionId] = useState<Id<'sessions'> | null>(null)
   const [selectedPastSession, setSelectedPastSession] = useState<any>(null)
   const [pastSortOrder, setPastSortOrder] = useState<'newest' | 'votes'>('votes')
+  const [exportingId, setExportingId] = useState<string | null>(null)
 
   const pastSessionQuestions = usePastSessionQuestions(selectedPastSession?._id ?? null)
 
@@ -77,6 +80,11 @@ function AdminDashboard() {
   const studentUrl =
     typeof window !== 'undefined'
       ? `${window.location.origin}/student/${adminInfo?.campusId}/${adminInfo?.level}`
+      : ''
+
+  const instructorUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/instructor/${adminInfo?.campusId}/${adminInfo?.level}`
       : ''
 
   const handleLogout = async () => {
@@ -144,6 +152,26 @@ function AdminDashboard() {
       projectorRef.current.focus()
     } else {
       projectorRef.current = window.open(url, '_blank', 'width=1200,height=800')
+    }
+  }
+
+  const handleExportSession = async (session: any) => {
+    setExportingId(session._id)
+    try {
+      const sessionQuestions = await convex.query(
+        api.questions.getSessionQuestions,
+        { sessionId: session._id as Id<'sessions'> },
+      )
+      if (sessionQuestions.length === 0) {
+        toast.error('No questions to export')
+        return
+      }
+      exportSessionToExcel(session, sessionQuestions)
+      toast.success('Excel exported')
+    } catch {
+      toast.error('Failed to export questions')
+    } finally {
+      setExportingId(null)
     }
   }
 
@@ -216,6 +244,7 @@ function AdminDashboard() {
                 sortOrder={sortOrder}
                 setSortOrder={setSortOrder}
                 studentUrl={studentUrl}
+                instructorUrl={instructorUrl}
               />
               </div>
             )}
@@ -243,6 +272,8 @@ function AdminDashboard() {
                     if (selectedPastSession?._id === id) setSelectedPastSession(null)
                     setDeleteSessionId(id)
                   }}
+                  onExport={handleExportSession}
+                  exportingId={exportingId}
                 />
               </div>
             </div>
@@ -267,6 +298,7 @@ function AdminDashboard() {
                     sortOrder={pastSortOrder}
                     setSortOrder={setPastSortOrder}
                     studentUrl={studentUrl}
+                    instructorUrl={instructorUrl}
                   />
                 </div>
               </div>
